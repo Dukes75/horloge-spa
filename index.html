@@ -6,11 +6,7 @@
 
 <meta charset="utf-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-
-<title>Horloge Spa</title>
-
-<!-- Mode application plein écran sur iPad -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -18,11 +14,15 @@
 
 <meta name="apple-mobile-web-app-title" content="Horloge Spa">
 
+<title>Horloge Spa</title>
+
 <style>
 
 html,body{
 
   margin:0;
+
+  padding:0;
 
   width:100%;
 
@@ -76,7 +76,7 @@ html,body{
 
   position:absolute;
 
-  top:4%;
+  top:5%;
 
   right:4%;
 
@@ -88,7 +88,7 @@ html,body{
 
 #weatherMain{
 
-  font-size:clamp(20px,3.5vw,44px);
+  font-size:28px;
 
   white-space:nowrap;
 
@@ -96,9 +96,9 @@ html,body{
 
 #weatherDetails{
 
-  font-size:clamp(16px,2vw,27px);
+  font-size:20px;
 
-  margin-top:10px;
+  margin-top:8px;
 
 }
 
@@ -112,9 +112,11 @@ html,body{
 
   width:90%;
 
-  transform:translateY(-50%);
-
   text-align:center;
+
+  -webkit-transform:translateY(-50%);
+
+  transform:translateY(-50%);
 
   text-shadow:0 3px 20px #222;
 
@@ -122,13 +124,13 @@ html,body{
 
 #clock{
 
-  font-size:clamp(100px,25vw,340px);
+  font-size:210px;
 
   font-weight:200;
 
   line-height:1;
 
-  letter-spacing:-.045em;
+  letter-spacing:-8px;
 
   white-space:nowrap;
 
@@ -136,29 +138,47 @@ html,body{
 
 #date{
 
-  font-size:clamp(25px,5vw,65px);
+  font-size:52px;
 
-  margin:12px auto 0;
+  margin-top:18px;
 
   white-space:nowrap;
 
   display:block;
 
-  width:max-content;
-
-  max-width:100%;
-
-  transform-origin:center;
+  text-align:center;
 
 }
 
-@media(orientation:portrait){
+/* Adaptation aux petits écrans */
 
-  #clock{font-size:25vw}
+@media(max-width:700px){
 
-  #date{font-size:5vw}
+  #clock{
 
-  #weather{top:5%;right:5%}
+    font-size:100px;
+
+    letter-spacing:-4px;
+
+  }
+
+  #date{
+
+    font-size:30px;
+
+  }
+
+  #weatherMain{
+
+    font-size:20px;
+
+  }
+
+  #weatherDetails{
+
+    font-size:16px;
+
+  }
 
 }
 
@@ -214,41 +234,65 @@ function changePhoto(){
 
 }
 
-function adjustDate(){
+function fitText(){
 
   var clock=document.getElementById("clock");
 
   var date=document.getElementById("date");
 
-  date.style.transform="none";
+  var center=document.getElementById("center");
 
-  var cw=clock.getBoundingClientRect().width;
+  // Réinitialisation des tailles
 
-  var temp=document.createElement("span");
+  clock.style.fontSize="210px";
 
-  temp.style.cssText=
+  date.style.fontSize="52px";
 
-    "position:absolute;visibility:hidden;white-space:nowrap;"+
+  var maxWidth=center.clientWidth*0.94;
 
-    "font:inherit;";
+  // Ajustement de l'heure
 
-  temp.textContent=clock.textContent;
+  var size=210;
 
-  clock.appendChild(temp);
+  while(clock.scrollWidth>maxWidth && size>40){
 
-  var clockWidth=temp.offsetWidth;
+    size-=2;
 
-  clock.removeChild(temp);
+    clock.style.fontSize=size+"px";
 
-  var dateWidth=date.offsetWidth;
+  }
 
-  if(clockWidth>0 && dateWidth>0){
+  // Mesure réelle du texte de l'heure
 
-    var scale=clockWidth/dateWidth;
+  var span=document.createElement("span");
 
-    if(scale>1.8)scale=1.8;
+  span.style.fontSize=size+"px";
 
-    date.style.transform="scaleX("+scale+")";
+  span.style.fontFamily="Arial";
+
+  span.style.letterSpacing="-8px";
+
+  span.style.whiteSpace="nowrap";
+
+  span.innerHTML=clock.innerHTML;
+
+  document.body.appendChild(span);
+
+  var clockWidth=span.offsetWidth;
+
+  document.body.removeChild(span);
+
+  // Ajustement de la date
+
+  var dateSize=52;
+
+  date.style.fontSize=dateSize+"px";
+
+  while(date.scrollWidth>clockWidth && dateSize>15){
+
+    dateSize-=1;
+
+    date.style.fontSize=dateSize+"px";
 
   }
 
@@ -276,7 +320,7 @@ function tick(){
 
     });
 
-  adjustDate();
+  fitText();
 
 }
 
@@ -366,7 +410,7 @@ setInterval(changePhoto,240000);
 
 setInterval(weather,900000);
 
-window.onresize=adjustDate;
+window.onresize=fitText;
 
 </script>
 

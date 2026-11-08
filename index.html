@@ -1,405 +1,257 @@
+
 <!DOCTYPE html>
-
 <html lang="fr">
-
 <head>
-
 <meta charset="utf-8">
-
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Horloge Spa">
-
 <title>Horloge Spa</title>
 
 <style>
-
 html,body{
-
   margin:0;
-
   padding:0;
-
   width:100%;
-
   height:100%;
-
   overflow:hidden;
-
   background:#151c22;
-
   color:white;
-
   font-family:Arial,sans-serif;
-
 }
 
 #photo{
-
   position:absolute;
-
   top:0;
-
   left:0;
-
   width:100%;
-
   height:100%;
-
   background-size:cover;
-
   background-position:center;
-
 }
 
 #shade{
-
   position:absolute;
-
   top:0;
-
   left:0;
-
   width:100%;
-
   height:100%;
-
   background:rgba(0,0,0,.28);
-
 }
 
 #weather{
-
   position:absolute;
-
-  top:6%;
-
+  top:5%;
   right:4%;
-
   text-align:right;
-
   text-shadow:0 2px 12px #222;
-
 }
 
 #weatherMain{
-
   font-size:28px;
-
   white-space:nowrap;
-
 }
 
 #weatherDetails{
-
   font-size:20px;
-
   margin-top:8px;
-
 }
 
 #center{
-
   position:absolute;
-
   top:53%;
-
-  left:4%;
-
-  width:92%;
-
+  left:5%;
+  width:90%;
   text-align:center;
-
   -webkit-transform:translateY(-50%);
-
   transform:translateY(-50%);
-
   text-shadow:0 3px 20px #222;
-
 }
 
 #clock{
-
-  display:inline-block;
-
-  font-size:210px;
-
+  font-family:Arial,sans-serif;
+  font-size:180px;
   font-weight:200;
-
   line-height:1;
-
-  letter-spacing:-8px;
-
+  letter-spacing:-5px;
   white-space:nowrap;
-
 }
 
 #date{
-
-  display:block;
-
-  width:max-content;
-
-  max-width:none;
-
-  margin:18px auto 0;
-
-  font-size:52px;
-
-  font-weight:400;
-
+  font-family:Arial,sans-serif;
+  font-size:45px;
+  margin-top:15px;
   white-space:nowrap;
-
   line-height:1.2;
-
-  -webkit-transform-origin:center center;
-
-  transform-origin:center center;
-
-}
-
-@media(max-width:700px){
-
-  #weatherMain{font-size:20px}
-
-  #weatherDetails{font-size:16px}
-
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div id="photo"></div>
-
 <div id="shade"></div>
 
 <div id="weather">
-
   <div id="weatherMain">Chocques | Météo...</div>
-
   <div id="weatherDetails"></div>
-
 </div>
 
 <div id="center">
-
   <div id="clock">--:--</div>
-
   <div id="date"></div>
-
 </div>
 
 <script>
-
 var photos=[
-
 "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1600",
-
 "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600",
-
 "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600",
-
 "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600"
-
 ];
 
 var n=0;
 
 function changePhoto(){
-
   document.getElementById("photo").style.backgroundImage=
-
     'url("'+photos[n]+'")';
-
   n=(n+1)%photos.length;
+}
 
+function measureText(text,fontSize,letterSpacing){
+  var span=document.createElement("span");
+  span.style.position="absolute";
+  span.style.visibility="hidden";
+  span.style.whiteSpace="nowrap";
+  span.style.fontFamily="Arial,sans-serif";
+  span.style.fontWeight="normal";
+  span.style.fontSize=fontSize+"px";
+  span.style.letterSpacing=letterSpacing+"px";
+  span.textContent=text;
+  document.body.appendChild(span);
+  var width=span.getBoundingClientRect().width;
+  document.body.removeChild(span);
+  return width;
 }
 
 function fitText(){
-
   var clock=document.getElementById("clock");
-
   var date=document.getElementById("date");
-
   var center=document.getElementById("center");
 
-  // Mesure de l'heure sans boucle instable
+  var maxWidth=center.clientWidth*0.96;
 
-  clock.style.fontSize="210px";
+  // Heure : utilise 90 % de la largeur disponible
+  var targetWidth=maxWidth*0.90;
+  var clockSize=180;
+  var clockText=clock.textContent;
 
-  var available=center.clientWidth*0.96;
-
-  var naturalClock=clock.offsetWidth;
-
-  if(naturalClock>available){
-
-    var ratio=available/naturalClock;
-
-    clock.style.fontSize=
-
-      Math.floor(210*ratio)+"px";
-
+  var measured=measureText(clockText,clockSize,-5);
+  if(measured>0){
+    clockSize=clockSize*targetWidth/measured;
   }
 
-  // Largeur réelle de l'heure
+  // Limite pour éviter une hauteur excessive
+  clockSize=Math.min(clockSize,center.clientHeight*0.75 || 300);
 
-  var clockWidth=clock.offsetWidth;
+  clock.style.fontSize=clockSize+"px";
+  clock.style.letterSpacing=(-5*clockSize/180)+"px";
 
-  // Réinitialisation de la date
+  // Mesure finale de l'heure
+  var clockWidth=measureText(
+    clockText,
+    clockSize,
+    -5*clockSize/180
+  );
 
-  date.style.webkitTransform="none";
+  // Date : même largeur visuelle que l'heure
+  var dateText=date.textContent;
+  var dateSize=45;
+  var dateWidth=measureText(dateText,dateSize,0);
 
-  date.style.transform="none";
-
-  date.style.fontSize="52px";
-
-  // Largeur naturelle de la date
-
-  var dateWidth=date.offsetWidth;
-
-  if(dateWidth>0 && clockWidth>0){
-
-    // Même largeur visuelle que l'heure
-
-    var scale=clockWidth/dateWidth;
-
-    date.style.webkitTransform="scaleX("+scale+")";
-
-    date.style.transform="scaleX("+scale+")";
-
+  if(dateWidth>0){
+    dateSize=dateSize*clockWidth/dateWidth;
   }
 
+  date.style.fontSize=dateSize+"px";
 }
 
 function tick(){
-
   var d=new Date();
-
   var h=("0"+d.getHours()).slice(-2);
-
   var m=("0"+d.getMinutes()).slice(-2);
 
   document.getElementById("clock").textContent=h+":"+m;
 
   document.getElementById("date").textContent=
-
     d.toLocaleDateString("fr-FR",{
-
       weekday:"long",
-
       day:"numeric",
-
       month:"long"
-
     });
 
   fitText();
-
 }
 
 function weatherIcon(code){
-
   if(code===0)return "☀️";
-
   if(code<=3)return "🌤️";
-
   if(code===45||code===48)return "🌫️";
-
   if(code>=51&&code<=67)return "🌧️";
-
   if(code>=71&&code<=77)return "❄️";
-
   if(code>=80&&code<=82)return "🌦️";
-
   if(code>=95)return "⛈️";
-
   return "☁️";
-
 }
 
 function weather(){
-
   var x=new XMLHttpRequest();
 
   var url=
-
     "https://api.open-meteo.com/v1/forecast"+
-
     "?latitude=50.54"+
-
     "&longitude=2.57"+
-
     "&current=temperature_2m,weather_code"+
-
     "&daily=temperature_2m_max,temperature_2m_min"+
-
     "&timezone=Europe%2FParis";
 
   x.open("GET",url,true);
 
   x.onreadystatechange=function(){
-
-    if(x.readyState===4 && x.status===200){
-
+    if(x.readyState===4&&x.status===200){
       try{
-
         var d=JSON.parse(x.responseText);
 
         var temp=Math.round(d.current.temperature_2m);
-
         var max=Math.round(d.daily.temperature_2m_max[0]);
-
         var min=Math.round(d.daily.temperature_2m_min[0]);
-
         var icon=weatherIcon(d.current.weather_code);
 
         document.getElementById("weatherMain").textContent=
-
           "Chocques | "+icon+" "+temp+"°C";
 
         document.getElementById("weatherDetails").textContent=
-
           "Max "+max+"°C  •  Min "+min+"°C";
 
-      }catch(e){
-
-        document.getElementById("weatherMain").textContent=
-
-          "Chocques";
-
-      }
-
+      }catch(e){}
     }
-
   };
 
   x.send();
-
 }
 
 changePhoto();
-
 tick();
-
 weather();
 
 setInterval(tick,1000);
-
 setInterval(changePhoto,240000);
-
 setInterval(weather,900000);
 
 window.onresize=fitText;
 
 </script>
-
 </body>
-
 </html>

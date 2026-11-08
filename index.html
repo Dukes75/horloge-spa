@@ -1,87 +1,441 @@
 <!DOCTYPE html>
+
 <html lang="fr">
+
 <head>
+
 <meta charset="utf-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+
 <title>Horloge Spa</title>
+
 <style>
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#151c22;color:white;font-family:Arial,sans-serif}
-#photo{position:absolute;inset:0;background-size:cover;background-position:center}
-#shade{position:absolute;inset:0;background:rgba(0,0,0,.28)}
-#weather{position:absolute;top:4%;right:4%;text-align:right;text-shadow:0 2px 12px #222}
-#weatherMain{font-size:clamp(20px,3.5vw,44px);white-space:nowrap}
-#weatherDetails{font-size:clamp(16px,2vw,27px);margin-top:10px}
-#center{position:absolute;top:52%;left:5%;width:90%;transform:translateY(-50%);text-align:center;text-shadow:0 3px 20px #222}
-#clock{font-size:clamp(100px,25vw,340px);font-weight:200;line-height:1;letter-spacing:-.045em;white-space:nowrap}
-#date{font-size:clamp(25px,5vw,65px);margin-top:12px;white-space:nowrap}
-@media(orientation:portrait){#clock{font-size:25vw}#date{font-size:5vw}#weather{top:5%;right:5%}}
+
+html,body{
+
+ margin:0;
+
+ padding:0;
+
+ width:100%;
+
+ height:100%;
+
+ overflow:hidden;
+
+ background:#151c22;
+
+ color:white;
+
+ font-family:Arial,Helvetica,sans-serif;
+
+}
+
+#photo{
+
+ position:absolute;
+
+ top:0;
+
+ left:0;
+
+ width:100%;
+
+ height:100%;
+
+ background-color:#151c22;
+
+ background-size:cover;
+
+ background-position:center;
+
+ background-repeat:no-repeat;
+
+}
+
+#shade{
+
+ position:absolute;
+
+ top:0;
+
+ left:0;
+
+ width:100%;
+
+ height:100%;
+
+ background:rgba(0,0,0,.30);
+
+}
+
+#weather{
+
+ position:absolute;
+
+ top:5%;
+
+ right:5%;
+
+ text-align:right;
+
+ z-index:2;
+
+ text-shadow:0 2px 12px #111;
+
+}
+
+#weatherMain{
+
+ font-size:28px;
+
+ white-space:nowrap;
+
+}
+
+#weatherDetails{
+
+ font-size:20px;
+
+ margin-top:8px;
+
+ white-space:nowrap;
+
+}
+
+#center{
+
+ position:absolute;
+
+ top:54%;
+
+ left:3%;
+
+ width:94%;
+
+ text-align:center;
+
+ transform:translateY(-50%);
+
+ -webkit-transform:translateY(-50%);
+
+ text-shadow:0 3px 20px #111;
+
+ z-index:2;
+
+}
+
+#clock{
+
+ font-size:190px;
+
+ font-weight:normal;
+
+ line-height:1.05;
+
+ letter-spacing:-5px;
+
+ white-space:nowrap;
+
+}
+
+#date{
+
+ display:inline-block;
+
+ font-size:42px;
+
+ margin-top:14px;
+
+ white-space:nowrap;
+
+ transform-origin:center;
+
+ -webkit-transform-origin:center;
+
+}
+
 </style>
+
 </head>
+
 <body>
+
 <div id="photo"></div>
+
 <div id="shade"></div>
+
 <div id="weather">
-<div id="weatherMain">Chocques | Météo...</div>
-<div id="weatherDetails"></div>
+
+ <div id="weatherMain">Chocques | Météo...</div>
+
+ <div id="weatherDetails"></div>
+
 </div>
+
 <div id="center">
-<div id="clock">--:--</div>
-<div id="date"></div>
+
+ <div id="clock">--:--</div>
+
+ <div id="date"></div>
+
 </div>
+
 <script>
+
+// PHOTOS
+
 var photos=[
-"https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1600",
-"https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600",
-"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600",
-"https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600"
+
+ "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200",
+
+ "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+
+ "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
+
+ "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200"
+
 ];
+
 var n=0;
+
 function changePhoto(){
-document.getElementById("photo").style.backgroundImage='url("'+photos[n]+'")';
-n=(n+1)%photos.length;
+
+ var essais=0;
+
+ function charger(){
+
+  if(essais>=photos.length)return;
+
+  var adresse=photos[n];
+
+  n=(n+1)%photos.length;
+
+  essais++;
+
+  var img=new Image();
+
+  img.onload=function(){
+
+   document.getElementById("photo").style.backgroundImage=
+
+    'url("'+adresse+'")';
+
+  };
+
+  img.onerror=function(){
+
+   charger();
+
+  };
+
+  img.src=adresse;
+
+ }
+
+ charger();
+
 }
+
+// ADAPTATION A L'ECRAN
+
+function ajuster(){
+
+ var largeur=window.innerWidth;
+
+ var hauteur=window.innerHeight;
+
+ var horloge=document.getElementById("clock");
+
+ var date=document.getElementById("date");
+
+ var taille=Math.min(largeur*.27,hauteur*.40);
+
+ horloge.style.fontSize=taille+"px";
+
+ var largeurMax=largeur*.94;
+
+ if(horloge.scrollWidth>largeurMax){
+
+  taille=taille*largeurMax/horloge.scrollWidth;
+
+  horloge.style.fontSize=taille+"px";
+
+ }
+
+ date.style.fontSize=
+
+  Math.min(largeur*.065,hauteur*.085)+"px";
+
+ date.style.transform="none";
+
+ date.style.webkitTransform="none";
+
+ var largeurHeure=horloge.scrollWidth;
+
+ var largeurDate=date.offsetWidth;
+
+ if(largeurDate>0){
+
+  var facteur=largeurHeure/largeurDate;
+
+  date.style.transform="scaleX("+facteur+")";
+
+  date.style.webkitTransform="scaleX("+facteur+")";
+
+ }
+
+ document.getElementById("weatherMain").style.fontSize=
+
+  Math.max(18,Math.min(largeur*.035,32))+"px";
+
+ document.getElementById("weatherDetails").style.fontSize=
+
+  Math.max(15,Math.min(largeur*.025,23))+"px";
+
+}
+
+// HORLOGE
+
 function tick(){
-var d=new Date();
-var h=("0"+d.getHours()).slice(-2);
-var m=("0"+d.getMinutes()).slice(-2);
-document.getElementById("clock").textContent=h+":"+m;
-document.getElementById("date").textContent=d.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"});
+
+ var d=new Date();
+
+ var h=("0"+d.getHours()).slice(-2);
+
+ var m=("0"+d.getMinutes()).slice(-2);
+
+ document.getElementById("clock").textContent=h+":"+m;
+
+ document.getElementById("date").textContent=
+
+  d.toLocaleDateString("fr-FR",{
+
+   weekday:"long",
+
+   day:"numeric",
+
+   month:"long"
+
+  });
+
+ ajuster();
+
 }
+
+// ICONES METEO
+
 function weatherIcon(code){
-if(code===0)return "☀️";
-if(code<=3)return "🌤️";
-if(code===45||code===48)return "🌫️";
-if(code>=51&&code<=67)return "🌧️";
-if(code>=71&&code<=77)return "❄️";
-if(code>=80&&code<=82)return "🌦️";
-if(code>=95)return "⛈️";
-return "☁️";
+
+ if(code===0)return "☀";
+
+ if(code<=3)return "⛅";
+
+ if(code===45||code===48)return "☁";
+
+ if(code>=51&&code<=67)return "☂";
+
+ if(code>=71&&code<=77)return "❄";
+
+ if(code>=80&&code<=82)return "☂";
+
+ if(code>=95)return "⚡";
+
+ return "☁";
+
 }
+
+// METEO DE CHOCQUES
+
 function weather(){
-var x=new XMLHttpRequest();
-var url="https://api.open-meteo.com/v1/forecast?latitude=50.54&longitude=2.57&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FParis";
-x.open("GET",url,true);
-x.onreadystatechange=function(){
-if(x.readyState===4&&x.status===200){
-try{
-var d=JSON.parse(x.responseText);
-var temp=Math.round(d.current.temperature_2m);
-var max=Math.round(d.daily.temperature_2m_max[0]);
-var min=Math.round(d.daily.temperature_2m_min[0]);
-var icon=weatherIcon(d.current.weather_code);
-document.getElementById("weatherMain").textContent="Chocques | "+icon+" "+temp+"°C";
-document.getElementById("weatherDetails").textContent="Max "+max+"°C  •  Min "+min+"°C";
-}catch(e){}
+
+ var x=new XMLHttpRequest();
+
+ var url=
+
+ "https://api.open-meteo.com/v1/forecast"+
+
+ "?latitude=50.54"+
+
+ "&longitude=2.57"+
+
+ "&current=temperature_2m,weather_code"+
+
+ "&daily=temperature_2m_max,temperature_2m_min"+
+
+ "&timezone=Europe%2FParis";
+
+ x.open("GET",url,true);
+
+ x.onreadystatechange=function(){
+
+  if(x.readyState===4&&x.status===200){
+
+   try{
+
+    var d=JSON.parse(x.responseText);
+
+    var temp=Math.round(d.current.temperature_2m);
+
+    var max=Math.round(d.daily.temperature_2m_max[0]);
+
+    var min=Math.round(d.daily.temperature_2m_min[0]);
+
+    var icone=weatherIcon(d.current.weather_code);
+
+    document.getElementById("weatherMain").textContent=
+
+     "Chocques | "+icone+" "+temp+"°C";
+
+    document.getElementById("weatherDetails").textContent=
+
+     "Max "+max+"°C  •  Min "+min+"°C";
+
+    ajuster();
+
+   }catch(e){
+
+    document.getElementById("weatherMain").textContent=
+
+     "Chocques | Météo indisponible";
+
+   }
+
+  }
+
+ };
+
+ x.send();
+
 }
-};
-x.send();
-}
+
+// DEMARRAGE
+
 changePhoto();
+
 tick();
+
 weather();
+
+// HEURE
+
 setInterval(tick,1000);
+
+// PHOTOS : 4 MINUTES
+
 setInterval(changePhoto,240000);
+
+// METEO : 15 MINUTES
+
 setInterval(weather,900000);
+
+// ROTATION ECRAN
+
+window.onresize=ajuster;
+
 </script>
+
 </body>
+
 </html>

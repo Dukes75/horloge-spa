@@ -48,7 +48,7 @@ html,body{
 
  background-size:cover;
 
- background-position:center;
+ background-position:center center;
 
  background-repeat:no-repeat;
 
@@ -116,9 +116,9 @@ html,body{
 
  text-align:center;
 
- transform:translateY(-50%);
-
  -webkit-transform:translateY(-50%);
+
+ transform:translateY(-50%);
 
  text-shadow:0 3px 20px #111;
 
@@ -127,6 +127,8 @@ html,body{
 }
 
 #clock{
+
+ display:inline-block;
 
  font-size:190px;
 
@@ -138,6 +140,18 @@ html,body{
 
  white-space:nowrap;
 
+ font-variant-numeric:tabular-nums;
+
+}
+
+#dateRow{
+
+ width:100%;
+
+ text-align:center;
+
+ margin-top:5px;
+
 }
 
 #date{
@@ -146,13 +160,13 @@ html,body{
 
  font-size:42px;
 
- margin-top:14px;
+ font-weight:normal;
+
+ line-height:1.15;
 
  white-space:nowrap;
 
- transform-origin:center;
-
- -webkit-transform-origin:center;
+ letter-spacing:0;
 
 }
 
@@ -178,11 +192,15 @@ html,body{
 
  <div id="clock">--:--</div>
 
- <div id="date"></div>
+ <div id="dateRow">
+
+  <div id="date"></div>
+
+ </div>
 
 </div>
 
-<script>
+<script type="text/javascript">
 
 // PHOTOS
 
@@ -238,7 +256,7 @@ function changePhoto(){
 
 }
 
-// ADAPTATION A L'ECRAN
+// ADAPTATION DE LA PRESENTATION
 
 function ajuster(){
 
@@ -250,41 +268,69 @@ function ajuster(){
 
  var date=document.getElementById("date");
 
- var taille=Math.min(largeur*.27,hauteur*.40);
+ // Heure XXL
+
+ var taille=Math.min(largeur*0.27,hauteur*0.40);
 
  horloge.style.fontSize=taille+"px";
 
- var largeurMax=largeur*.94;
+ // Limiter l'heure à 94% de l'écran
 
- if(horloge.scrollWidth>largeurMax){
+ var largeurMax=largeur*0.94;
 
-  taille=taille*largeurMax/horloge.scrollWidth;
+ var largeurHeure=horloge.getBoundingClientRect().width;
+
+ if(largeurHeure>largeurMax){
+
+  taille=taille*largeurMax/largeurHeure;
 
   horloge.style.fontSize=taille+"px";
 
+  largeurHeure=horloge.getBoundingClientRect().width;
+
  }
 
- date.style.fontSize=
-
-  Math.min(largeur*.065,hauteur*.085)+"px";
+ // Supprimer tout ancien étirement
 
  date.style.transform="none";
 
  date.style.webkitTransform="none";
 
- var largeurHeure=horloge.scrollWidth;
+ date.style.letterSpacing="0px";
 
- var largeurDate=date.offsetWidth;
+ // Ajuster la taille de la date
+
+ var tailleDate=Math.min(largeur*0.065,hauteur*0.085);
+
+ date.style.fontSize=tailleDate+"px";
+
+ var largeurDate=date.getBoundingClientRect().width;
 
  if(largeurDate>0){
 
-  var facteur=largeurHeure/largeurDate;
+  // Adapter la taille des lettres
 
-  date.style.transform="scaleX("+facteur+")";
+  tailleDate=tailleDate*largeurHeure/largeurDate;
 
-  date.style.webkitTransform="scaleX("+facteur+")";
+  date.style.fontSize=tailleDate+"px";
+
+  // Ajustement final par espacement
+
+  largeurDate=date.getBoundingClientRect().width;
+
+  var nbCaracteres=date.textContent.length;
+
+  if(nbCaracteres>1){
+
+   var ecart=(largeurHeure-largeurDate)/(nbCaracteres-1);
+
+   date.style.letterSpacing=ecart+"px";
+
+  }
 
  }
+
+ // Météo
 
  document.getElementById("weatherMain").style.fontSize=
 
@@ -392,8 +438,6 @@ function weather(){
 
      "Max "+max+"°C  •  Min "+min+"°C";
 
-    ajuster();
-
    }catch(e){
 
     document.getElementById("weatherMain").textContent=
@@ -418,19 +462,19 @@ tick();
 
 weather();
 
-// HEURE
+// Actualisation de l'heure
 
 setInterval(tick,1000);
 
-// PHOTOS : 4 MINUTES
+// Changement des photos toutes les 4 minutes
 
 setInterval(changePhoto,240000);
 
-// METEO : 15 MINUTES
+// Actualisation météo toutes les 15 minutes
 
 setInterval(weather,900000);
 
-// ROTATION ECRAN
+// Adaptation lors de la rotation de l'iPad
 
 window.onresize=ajuster;
 

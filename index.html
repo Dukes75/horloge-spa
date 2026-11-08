@@ -10,163 +10,155 @@
 
 <title>Horloge Spa</title>
 
+<!-- Mode application plein écran sur iPad -->
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="apple-mobile-web-app-title" content="Horloge Spa">
+
 <style>
 
 html,body{
 
- margin:0;
+  margin:0;
 
- padding:0;
+  width:100%;
 
- width:100%;
+  height:100%;
 
- height:100%;
+  overflow:hidden;
 
- overflow:hidden;
+  background:#151c22;
 
- background:#151c22;
+  color:white;
 
- color:white;
-
- font-family:Arial,Helvetica,sans-serif;
+  font-family:Arial,sans-serif;
 
 }
 
 #photo{
 
- position:absolute;
+  position:absolute;
 
- top:0;
+  top:0;
 
- left:0;
+  left:0;
 
- width:100%;
+  width:100%;
 
- height:100%;
+  height:100%;
 
- background-color:#151c22;
+  background-size:cover;
 
- background-size:cover;
-
- background-position:center center;
-
- background-repeat:no-repeat;
+  background-position:center;
 
 }
 
 #shade{
 
- position:absolute;
+  position:absolute;
 
- top:0;
+  top:0;
 
- left:0;
+  left:0;
 
- width:100%;
+  width:100%;
 
- height:100%;
+  height:100%;
 
- background:rgba(0,0,0,.30);
+  background:rgba(0,0,0,.28);
 
 }
 
 #weather{
 
- position:absolute;
+  position:absolute;
 
- top:5%;
+  top:4%;
 
- right:5%;
+  right:4%;
 
- text-align:right;
+  text-align:right;
 
- z-index:2;
-
- text-shadow:0 2px 12px #111;
+  text-shadow:0 2px 12px #222;
 
 }
 
 #weatherMain{
 
- font-size:28px;
+  font-size:clamp(20px,3.5vw,44px);
 
- white-space:nowrap;
+  white-space:nowrap;
 
 }
 
 #weatherDetails{
 
- font-size:20px;
+  font-size:clamp(16px,2vw,27px);
 
- margin-top:8px;
-
- white-space:nowrap;
+  margin-top:10px;
 
 }
 
 #center{
 
- position:absolute;
+  position:absolute;
 
- top:54%;
+  top:52%;
 
- left:3%;
+  left:5%;
 
- width:94%;
+  width:90%;
 
- text-align:center;
+  transform:translateY(-50%);
 
- -webkit-transform:translateY(-50%);
+  text-align:center;
 
- transform:translateY(-50%);
-
- text-shadow:0 3px 20px #111;
-
- z-index:2;
+  text-shadow:0 3px 20px #222;
 
 }
 
 #clock{
 
- display:inline-block;
+  font-size:clamp(100px,25vw,340px);
 
- font-size:190px;
+  font-weight:200;
 
- font-weight:normal;
+  line-height:1;
 
- line-height:1.05;
+  letter-spacing:-.045em;
 
- letter-spacing:-5px;
-
- white-space:nowrap;
-
- font-variant-numeric:tabular-nums;
-
-}
-
-#dateRow{
-
- width:100%;
-
- text-align:center;
-
- margin-top:5px;
+  white-space:nowrap;
 
 }
 
 #date{
 
- display:inline-block;
+  font-size:clamp(25px,5vw,65px);
 
- font-size:42px;
+  margin:12px auto 0;
 
- font-weight:normal;
+  white-space:nowrap;
 
- line-height:1.15;
+  display:block;
 
- white-space:nowrap;
+  width:max-content;
 
- letter-spacing:0;
+  max-width:100%;
+
+  transform-origin:center;
+
+}
+
+@media(orientation:portrait){
+
+  #clock{font-size:25vw}
+
+  #date{font-size:5vw}
+
+  #weather{top:5%;right:5%}
 
 }
 
@@ -182,37 +174,31 @@ html,body{
 
 <div id="weather">
 
- <div id="weatherMain">Chocques | Météo...</div>
+  <div id="weatherMain">Chocques | Météo...</div>
 
- <div id="weatherDetails"></div>
+  <div id="weatherDetails"></div>
 
 </div>
 
 <div id="center">
 
- <div id="clock">--:--</div>
-
- <div id="dateRow">
+  <div id="clock">--:--</div>
 
   <div id="date"></div>
 
- </div>
-
 </div>
 
-<script type="text/javascript">
-
-// PHOTOS
+<script>
 
 var photos=[
 
- "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200",
+"https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1600",
 
- "https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200",
+"https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1600",
 
- "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200",
+"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600",
 
- "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200"
+"https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600"
 
 ];
 
@@ -220,241 +206,153 @@ var n=0;
 
 function changePhoto(){
 
- var essais=0;
+  document.getElementById("photo").style.backgroundImage=
 
- function charger(){
-
-  if(essais>=photos.length)return;
-
-  var adresse=photos[n];
+    'url("'+photos[n]+'")';
 
   n=(n+1)%photos.length;
 
-  essais++;
-
-  var img=new Image();
-
-  img.onload=function(){
-
-   document.getElementById("photo").style.backgroundImage=
-
-    'url("'+adresse+'")';
-
-  };
-
-  img.onerror=function(){
-
-   charger();
-
-  };
-
-  img.src=adresse;
-
- }
-
- charger();
-
 }
 
-// ADAPTATION DE LA PRESENTATION
+function adjustDate(){
 
-function ajuster(){
+  var clock=document.getElementById("clock");
 
- var largeur=window.innerWidth;
+  var date=document.getElementById("date");
 
- var hauteur=window.innerHeight;
+  date.style.transform="none";
 
- var horloge=document.getElementById("clock");
+  var cw=clock.getBoundingClientRect().width;
 
- var date=document.getElementById("date");
+  var temp=document.createElement("span");
 
- // Heure XXL
+  temp.style.cssText=
 
- var taille=Math.min(largeur*0.27,hauteur*0.40);
+    "position:absolute;visibility:hidden;white-space:nowrap;"+
 
- horloge.style.fontSize=taille+"px";
+    "font:inherit;";
 
- // Limiter l'heure à 94% de l'écran
+  temp.textContent=clock.textContent;
 
- var largeurMax=largeur*0.94;
+  clock.appendChild(temp);
 
- var largeurHeure=horloge.getBoundingClientRect().width;
+  var clockWidth=temp.offsetWidth;
 
- if(largeurHeure>largeurMax){
+  clock.removeChild(temp);
 
-  taille=taille*largeurMax/largeurHeure;
+  var dateWidth=date.offsetWidth;
 
-  horloge.style.fontSize=taille+"px";
+  if(clockWidth>0 && dateWidth>0){
 
-  largeurHeure=horloge.getBoundingClientRect().width;
+    var scale=clockWidth/dateWidth;
 
- }
+    if(scale>1.8)scale=1.8;
 
- // Supprimer tout ancien étirement
-
- date.style.transform="none";
-
- date.style.webkitTransform="none";
-
- date.style.letterSpacing="0px";
-
- // Ajuster la taille de la date
-
- var tailleDate=Math.min(largeur*0.065,hauteur*0.085);
-
- date.style.fontSize=tailleDate+"px";
-
- var largeurDate=date.getBoundingClientRect().width;
-
- if(largeurDate>0){
-
-  // Adapter la taille des lettres
-
-  tailleDate=tailleDate*largeurHeure/largeurDate;
-
-  date.style.fontSize=tailleDate+"px";
-
-  // Ajustement final par espacement
-
-  largeurDate=date.getBoundingClientRect().width;
-
-  var nbCaracteres=date.textContent.length;
-
-  if(nbCaracteres>1){
-
-   var ecart=(largeurHeure-largeurDate)/(nbCaracteres-1);
-
-   date.style.letterSpacing=ecart+"px";
+    date.style.transform="scaleX("+scale+")";
 
   }
 
- }
-
- // Météo
-
- document.getElementById("weatherMain").style.fontSize=
-
-  Math.max(18,Math.min(largeur*.035,32))+"px";
-
- document.getElementById("weatherDetails").style.fontSize=
-
-  Math.max(15,Math.min(largeur*.025,23))+"px";
-
 }
-
-// HORLOGE
 
 function tick(){
 
- var d=new Date();
+  var d=new Date();
 
- var h=("0"+d.getHours()).slice(-2);
+  var h=("0"+d.getHours()).slice(-2);
 
- var m=("0"+d.getMinutes()).slice(-2);
+  var m=("0"+d.getMinutes()).slice(-2);
 
- document.getElementById("clock").textContent=h+":"+m;
+  document.getElementById("clock").textContent=h+":"+m;
 
- document.getElementById("date").textContent=
+  document.getElementById("date").textContent=
 
-  d.toLocaleDateString("fr-FR",{
+    d.toLocaleDateString("fr-FR",{
 
-   weekday:"long",
+      weekday:"long",
 
-   day:"numeric",
+      day:"numeric",
 
-   month:"long"
+      month:"long"
 
-  });
+    });
 
- ajuster();
+  adjustDate();
 
 }
-
-// ICONES METEO
 
 function weatherIcon(code){
 
- if(code===0)return "☀";
+  if(code===0)return "☀️";
 
- if(code<=3)return "⛅";
+  if(code<=3)return "🌤️";
 
- if(code===45||code===48)return "☁";
+  if(code===45||code===48)return "🌫️";
 
- if(code>=51&&code<=67)return "☂";
+  if(code>=51&&code<=67)return "🌧️";
 
- if(code>=71&&code<=77)return "❄";
+  if(code>=71&&code<=77)return "❄️";
 
- if(code>=80&&code<=82)return "☂";
+  if(code>=80&&code<=82)return "🌦️";
 
- if(code>=95)return "⚡";
+  if(code>=95)return "⛈️";
 
- return "☁";
+  return "☁️";
 
 }
-
-// METEO DE CHOCQUES
 
 function weather(){
 
- var x=new XMLHttpRequest();
+  var x=new XMLHttpRequest();
 
- var url=
+  var url=
 
- "https://api.open-meteo.com/v1/forecast"+
+    "https://api.open-meteo.com/v1/forecast"+
 
- "?latitude=50.54"+
+    "?latitude=50.54"+
 
- "&longitude=2.57"+
+    "&longitude=2.57"+
 
- "&current=temperature_2m,weather_code"+
+    "&current=temperature_2m,weather_code"+
 
- "&daily=temperature_2m_max,temperature_2m_min"+
+    "&daily=temperature_2m_max,temperature_2m_min"+
 
- "&timezone=Europe%2FParis";
+    "&timezone=Europe%2FParis";
 
- x.open("GET",url,true);
+  x.open("GET",url,true);
 
- x.onreadystatechange=function(){
+  x.onreadystatechange=function(){
 
-  if(x.readyState===4&&x.status===200){
+    if(x.readyState===4&&x.status===200){
 
-   try{
+      try{
 
-    var d=JSON.parse(x.responseText);
+        var d=JSON.parse(x.responseText);
 
-    var temp=Math.round(d.current.temperature_2m);
+        var temp=Math.round(d.current.temperature_2m);
 
-    var max=Math.round(d.daily.temperature_2m_max[0]);
+        var max=Math.round(d.daily.temperature_2m_max[0]);
 
-    var min=Math.round(d.daily.temperature_2m_min[0]);
+        var min=Math.round(d.daily.temperature_2m_min[0]);
 
-    var icone=weatherIcon(d.current.weather_code);
+        var icon=weatherIcon(d.current.weather_code);
 
-    document.getElementById("weatherMain").textContent=
+        document.getElementById("weatherMain").textContent=
 
-     "Chocques | "+icone+" "+temp+"°C";
+          "Chocques | "+icon+" "+temp+"°C";
 
-    document.getElementById("weatherDetails").textContent=
+        document.getElementById("weatherDetails").textContent=
 
-     "Max "+max+"°C  •  Min "+min+"°C";
+          "Max "+max+"°C  •  Min "+min+"°C";
 
-   }catch(e){
+      }catch(e){}
 
-    document.getElementById("weatherMain").textContent=
+    }
 
-     "Chocques | Météo indisponible";
+  };
 
-   }
-
-  }
-
- };
-
- x.send();
+  x.send();
 
 }
-
-// DEMARRAGE
 
 changePhoto();
 
@@ -462,21 +360,13 @@ tick();
 
 weather();
 
-// Actualisation de l'heure
-
 setInterval(tick,1000);
-
-// Changement des photos toutes les 4 minutes
 
 setInterval(changePhoto,240000);
 
-// Actualisation météo toutes les 15 minutes
-
 setInterval(weather,900000);
 
-// Adaptation lors de la rotation de l'iPad
-
-window.onresize=ajuster;
+window.onresize=adjustDate;
 
 </script>
 
